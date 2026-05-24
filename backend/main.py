@@ -607,3 +607,365 @@ def get_backups():
     ).all()
 
     return backups
+
+# =========================
+# REPLICATION MODULE
+# =========================
+
+@app.post("/generate_replication")
+def generate_replication():
+
+    db = SessionLocal()
+
+    statuses = [
+        "ACCEPTABLE",
+        "WARNING",
+        "CRITICAL"
+    ]
+
+    lag_levels = [
+        2,
+        5,
+        20
+    ]
+
+    cap_modes = [
+        "CP",
+        "AP",
+        "CA"
+    ]
+
+    critical_replications = 0
+
+    for i in range(15):
+
+        lag = random.choice(
+            lag_levels
+        )
+
+        if lag <= 2:
+
+            status = "ACCEPTABLE"
+
+        elif lag <= 5:
+
+            status = "WARNING"
+
+        else:
+
+            status = "CRITICAL"
+
+            critical_replications += 1
+
+        replication = ReplicationLog(
+
+            primary_node=f"PRIMARY_{i}",
+
+            replica_node=f"REPLICA_{i}",
+
+            replication_lag=lag,
+
+            status=status,
+
+            cap_theorem=random.choice(
+                cap_modes
+            )
+        )
+
+        db.add(replication)
+
+    if critical_replications > 3:
+
+        alert = Alert(
+
+            title="REPLICATION LAG CRÍTICO",
+
+            severity="HIGH",
+
+            message=f"{critical_replications} nodos con lag crítico",
+
+            source="REPLICATION MODULE",
+
+            trigger_condition="replication_lag > 5",
+
+            affected_engine="PostgreSQL Cluster",
+
+            resolution_status="OPEN"
+        )
+
+        db.add(alert)
+
+    db.commit()
+
+    return {
+
+        "message":
+            "Replicación generada",
+
+        "critical_replications":
+            critical_replications
+    }
+
+
+@app.get("/replication")
+def get_replication():
+
+    db = SessionLocal()
+
+    replication = db.query(
+        ReplicationLog
+    ).all()
+
+    return replication
+
+
+# =========================
+# REDIS CACHE MODULE
+# =========================
+
+@app.post("/generate_cache")
+def generate_cache():
+
+    db = SessionLocal()
+
+    statuses = [
+        "HIT",
+        "MISS"
+    ]
+
+    hits = 0
+
+    misses = 0
+
+    for i in range(30):
+
+        status = random.choice(
+            statuses
+        )
+
+        if status == "HIT":
+
+            hits += 1
+
+        else:
+
+            misses += 1
+
+        cache = CacheLog(
+
+            cache_key=f"KEY_{i}",
+
+            cache_status=status,
+
+            ttl=random.randint(
+                30,
+                3600
+            ),
+
+            hit_ratio=round(
+                random.uniform(70, 99),
+                2
+            ),
+
+            cache_size=round(
+                random.uniform(1, 50),
+                2
+            )
+        )
+
+        db.add(cache)
+
+        redis_client.set(
+            f"KEY_{i}",
+            f"VALUE_{i}",
+            ex=3600
+        )
+
+    if misses > 10:
+
+        alert = Alert(
+
+            title="CACHE MISS ELEVADO",
+
+            severity="MEDIUM",
+
+            message=f"Se detectaron {misses} cache misses",
+
+            source="REDIS CACHE",
+
+            trigger_condition="cache_miss > 10",
+
+            affected_engine="Redis",
+
+            resolution_status="OPEN"
+        )
+
+        db.add(alert)
+
+    db.commit()
+
+    return {
+
+        "message":
+            "Cache generada",
+
+        "hits":
+            hits,
+
+        "misses":
+            misses
+    }
+
+
+@app.get("/cache")
+def get_cache():
+
+    db = SessionLocal()
+
+    cache = db.query(
+        CacheLog
+    ).all()
+
+    return cache
+
+
+@app.delete("/clear_cache")
+def clear_cache():
+
+    redis_client.flushall()
+
+    return {
+        "message":
+            "Cache limpiada"
+    }
+
+
+# =========================
+# ALERT ENGINE
+# =========================
+
+@app.get("/alerts")
+def get_alerts():
+
+    db = SessionLocal()
+
+    alerts = db.query(
+        Alert
+    ).all()
+
+    return alerts
+
+
+# =========================
+# AI ADVISOR
+# =========================
+
+@app.post("/generate_ai_recommendations")
+def generate_ai_recommendations():
+
+    db = SessionLocal()
+
+    recommendations = [
+
+        {
+            "title": "Optimizar índices",
+            "recommendation":
+                "Agregar índices en tablas críticas",
+            "severity": "HIGH",
+            "category": "QUERY"
+        },
+
+        {
+            "title": "Reducir deadlocks",
+            "recommendation":
+                "Aplicar aislamiento READ COMMITTED",
+            "severity": "MEDIUM",
+            "category": "CONCURRENCY"
+        },
+
+        {
+            "title": "Optimizar backups",
+            "recommendation":
+                "Mover backups a almacenamiento frío",
+            "severity": "LOW",
+            "category": "BACKUP"
+        }
+    ]
+
+    for rec in recommendations:
+
+        recommendation = AIRecommendation(
+
+            title=rec["title"],
+
+            recommendation=rec["recommendation"],
+
+            severity=rec["severity"],
+
+            category=rec["category"]
+        )
+
+        db.add(recommendation)
+
+    db.commit()
+
+    return {
+        "message":
+            "Recomendaciones generadas"
+    }
+
+
+@app.get("/ai_recommendations")
+def get_ai_recommendations():
+
+    db = SessionLocal()
+
+    recommendations = db.query(
+        AIRecommendation
+    ).all()
+
+    return recommendations
+
+
+# =========================
+# HEALTH MONITORING
+# =========================
+
+@app.get("/health")
+def health_check():
+
+    return {
+
+        "status":
+            "HEALTHY",
+
+        "database":
+            "CONNECTED",
+
+        "redis":
+            "CONNECTED",
+
+        "api":
+            "ONLINE",
+
+        "timestamp":
+            datetime.utcnow()
+    }
+
+
+# =========================
+# TOP QUERIES
+# =========================
+
+@app.get("/top_queries")
+def top_queries():
+
+    db = SessionLocal()
+
+    queries = db.query(
+        QueryLog
+    ).order_by(
+        QueryLog.duration_ms.desc()
+    ).limit(10).all()
+
+    return queries

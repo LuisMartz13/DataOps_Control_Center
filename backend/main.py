@@ -73,6 +73,8 @@ def register_user(user: UserLogin):
 
     if existing_user:
 
+        db.close()
+
         return {
             "error": "Usuario ya existe"
         }
@@ -86,6 +88,8 @@ def register_user(user: UserLogin):
     db.add(new_user)
 
     db.commit()
+
+    db.close()
 
     return {
         "message": "Usuario registrado"
@@ -103,6 +107,8 @@ def login(user: UserLogin):
     ).first()
 
     if not existing_user:
+
+        db.close()
 
         return {
             "error": "Credenciales inválidas"
@@ -122,6 +128,8 @@ def login(user: UserLogin):
         SECRET_KEY,
         algorithm=ALGORITHM
     )
+
+    db.close()
 
     return {
         "access_token": access_token,
@@ -156,6 +164,8 @@ def create_connection(connection: ConnectionCreate):
 
     db.refresh(new_connection)
 
+    db.close()
+
     return {
         "message": "Conexión creada correctamente",
         "id": new_connection.id
@@ -169,8 +179,9 @@ def get_connections():
 
     connections = db.query(Connection).all()
 
-    return connections
+    db.close()
 
+    return connections
 
 @app.delete("/connections/{connection_id}")
 def delete_connection(connection_id: int):
@@ -183,6 +194,8 @@ def delete_connection(connection_id: int):
 
     if not connection:
 
+        db.close()
+
         return {
             "error": "Conexión no encontrada"
         }
@@ -190,6 +203,8 @@ def delete_connection(connection_id: int):
     db.delete(connection)
 
     db.commit()
+
+    db.close()
 
     return {
         "message": "Conexión eliminada"
@@ -223,6 +238,8 @@ def generate_metrics():
 
     db.commit()
 
+    db.close()
+
     return {
         "message": "Métricas generadas"
     }
@@ -234,6 +251,8 @@ def get_metrics():
     db = SessionLocal()
 
     metrics = db.query(DBMetric).all()
+
+    db.close()
 
     return metrics
 
@@ -294,6 +313,8 @@ def generate_queries():
 
     db.commit()
 
+    db.close()
+
     return {
         "message": "Queries generadas"
     }
@@ -305,6 +326,8 @@ def get_queries():
     db = SessionLocal()
 
     queries = db.query(QueryLog).all()
+
+    db.close()
 
     return queries
 
@@ -407,6 +430,8 @@ def generate_transactions():
 
     db.commit()
 
+    db.close()
+
     return {
         "message": "100 transacciones generadas",
         "deadlocks": deadlocks,
@@ -422,6 +447,8 @@ def get_transactions():
     transactions = db.query(
         TXLog
     ).all()
+
+    db.close()
 
     return transactions
 
@@ -540,6 +567,8 @@ def generate_backups():
 
     db.commit()
 
+    db.close()
+
     return {
 
         "message": "Backups generados",
@@ -605,6 +634,8 @@ def get_backups():
     backups = db.query(
         BackupLog
     ).all()
+
+    db.close()
 
     return backups
 
@@ -697,6 +728,8 @@ def generate_replication():
 
     db.commit()
 
+    db.close()
+
     return {
 
         "message":
@@ -706,7 +739,6 @@ def generate_replication():
             critical_replications
     }
 
-
 @app.get("/replication")
 def get_replication():
 
@@ -715,6 +747,8 @@ def get_replication():
     replication = db.query(
         ReplicationLog
     ).all()
+
+    db.close()
 
     return replication
 
@@ -804,6 +838,8 @@ def generate_cache():
 
     db.commit()
 
+    db.close()
+
     return {
 
         "message":
@@ -825,6 +861,8 @@ def get_cache():
     cache = db.query(
         CacheLog
     ).all()
+
+    db.close()
 
     return cache
 
@@ -852,6 +890,8 @@ def get_alerts():
     alerts = db.query(
         Alert
     ).all()
+
+    db.close()
 
     return alerts
 
@@ -909,6 +949,8 @@ def generate_ai_recommendations():
 
     db.commit()
 
+    db.close()
+
     return {
         "message":
             "Recomendaciones generadas"
@@ -923,6 +965,8 @@ def get_ai_recommendations():
     recommendations = db.query(
         AIRecommendation
     ).all()
+
+    db.close()
 
     return recommendations
 
@@ -967,5 +1011,7 @@ def top_queries():
     ).order_by(
         QueryLog.duration_ms.desc()
     ).limit(10).all()
+
+    db.close()
 
     return queries

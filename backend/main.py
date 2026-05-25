@@ -895,6 +895,59 @@ def get_alerts():
 
     return alerts
 
+@app.get("/alerts")
+def get_alerts():
+
+    db = SessionLocal()
+
+    alerts = db.query(
+        Alert
+    ).all()
+
+    db.close()
+
+    return alerts
+
+
+@app.post("/generate_alerts")
+def generate_alerts():
+
+    db = SessionLocal()
+
+    alerts = [
+
+        Alert(
+            message="CPU superior al 90%",
+            severity="CRITICAL"
+        ),
+
+        Alert(
+            message="Deadlock detectado",
+            severity="WARNING"
+        ),
+
+        Alert(
+            message="Backup fallido en servidor secundario",
+            severity="HIGH"
+        )
+    ]
+
+    for alert in alerts:
+        db.add(alert)
+
+    db.commit()
+
+    db.close()
+
+    return {
+        "message": "Alertas generadas"
+    }
+
+
+# =========================
+# AI ADVISOR
+# =========================
+
 
 # =========================
 # AI ADVISOR

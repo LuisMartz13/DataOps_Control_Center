@@ -37,7 +37,11 @@ from schemas import (
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="DataOps Control Hub",
+    description="Plataforma inteligente para monitoreo, optimización y administración de bases de datos",
+    version="2.0.0"
+)
 
 SECRET_KEY = "dataops_secret_key"
 
@@ -54,7 +58,10 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get(
+"/",
+      tags=["Sistema"]
+)
 def home():
 
     return {
@@ -66,7 +73,10 @@ def home():
 # AUTH SYSTEM
 # =========================
 
-@app.post("/register")
+@app.post(
+"/register",
+    tags=["Autenticación"]
+)
 def register_user(user: UserLogin):
 
     db = SessionLocal()
@@ -100,7 +110,10 @@ def register_user(user: UserLogin):
     }
 
 
-@app.post("/login")
+@app.post(
+"/login",
+     tags=["Autenticación"]
+)
 def login(user: UserLogin):
 
     db = SessionLocal()
@@ -147,7 +160,10 @@ def login(user: UserLogin):
 # CONNECTIONS
 # =========================
 
-@app.post("/connections")
+@app.post(
+"/connections",
+     tags=["Conexiones"]
+)
 def create_connection(connection: ConnectionCreate):
 
     db = SessionLocal()
@@ -176,7 +192,10 @@ def create_connection(connection: ConnectionCreate):
     }
 
 
-@app.get("/connections")
+@app.get(
+    "/connections",
+tags=["Conexiones"]
+)
 def get_connections():
 
     db = SessionLocal()
@@ -187,7 +206,10 @@ def get_connections():
 
     return connections
 
-@app.delete("/connections/{connection_id}")
+@app.delete(
+    "/connections/{connection_id}",
+tags=["Conexiones"]
+)
 def delete_connection(connection_id: int):
 
     db = SessionLocal()

@@ -7,6 +7,9 @@ services:
     ports:
       - "8000:8000"
 
+    volumes:
+      - ./cloud_storage:/app/cloud_storage
+
     depends_on:
       - redis
 

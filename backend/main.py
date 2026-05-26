@@ -12,6 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, SessionLocal
 
+import os
+import json
+
+
 from models import (
     Base,
     Connection,
@@ -624,6 +628,38 @@ def restore_backup():
         "disaster_simulated":
             disaster_type
     }
+
+@app.post("/upload_cloud_backup")
+def upload_cloud_backup():
+
+    file_name = f"backup_{datetime.now().timestamp()}.json"
+
+    backup_data = {
+        "status": "BACKUP_OK",
+        "date": str(datetime.now())
+    }
+
+    CLOUD_PATH = "./cloud_storage"
+
+    os.makedirs(CLOUD_PATH, exist_ok=True)
+
+    with open(f"{CLOUD_PATH}/{file_name}", "w") as file:
+        json.dump(backup_data, file)
+
+    return {
+        "message": "Backup subido a la nube",
+        "file": file_name
+    }
+
+
+@app.get("/cloud_backups")
+def cloud_backups():
+
+    os.makedirs("cloud_storage", exist_ok=True)
+
+    files = os.listdir("cloud_storage")
+
+    return files
 
 
 @app.get("/backups")

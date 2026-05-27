@@ -241,7 +241,10 @@ def delete_connection(connection_id: int):
 # METRICS
 # =========================
 
-@app.post("/generate_metrics")
+@app.post(
+    "/generate_metrics",
+    tags=["Métricas"]
+)
 def generate_metrics():
 
     db = SessionLocal()
@@ -271,7 +274,10 @@ def generate_metrics():
     }
 
 
-@app.get("/metrics")
+@app.get(
+    "/metrics",
+    tags=["Métricas"]
+)
 def get_metrics():
 
     db = SessionLocal()
@@ -287,7 +293,10 @@ def get_metrics():
 # QUERY ANALYZER
 # =========================
 
-@app.post("/generate_queries")
+@app.post(
+    "/generate_queries",
+    tags=["Consultas SQL"]
+)
 def generate_queries():
 
     db = SessionLocal()
@@ -346,7 +355,10 @@ def generate_queries():
     }
 
 
-@app.get("/queries")
+@app.get(
+    "/queries",
+    tags=["Consultas SQL"]
+)
 def get_queries():
 
     db = SessionLocal()
@@ -362,7 +374,10 @@ def get_queries():
 # CONCURRENCY MODULE
 # =========================
 
-@app.post("/generate_transactions")
+@app.post(
+    "/generate_transactions",
+    tags=["Concurrencia"]
+)
 def generate_transactions():
 
     db = SessionLocal()
@@ -465,7 +480,10 @@ def generate_transactions():
     }
 
 
-@app.get("/transactions")
+@app.get(
+    "/transactions",
+    tags=["Concurrencia"]
+)
 def get_transactions():
 
     db = SessionLocal()
@@ -483,7 +501,10 @@ def get_transactions():
 # BACKUP & RECOVERY MODULE
 # =========================
 
-@app.post("/generate_backups")
+@app.post(
+    "/generate_backups",
+    tags=["Backups"]
+)
 def generate_backups():
 
     db = SessionLocal()
@@ -616,7 +637,10 @@ def generate_backups():
     }
 
 
-@app.post("/restore_backup")
+@app.post(
+    "/restore_backup",
+    tags=["Backups"]
+)
 def restore_backup():
 
     recovery_time = round(
@@ -651,7 +675,10 @@ def restore_backup():
             disaster_type
     }
 
-@app.post("/upload_cloud_backup")
+@app.post(
+    "/upload_cloud_backup",
+    tags=["Backups"]
+)
 def upload_cloud_backup():
 
     file_name = f"backup_{datetime.now().timestamp()}.json"
@@ -674,7 +701,10 @@ def upload_cloud_backup():
     }
 
 
-@app.get("/cloud_backups")
+@app.get(
+    "/cloud_backups",
+    tags=["Backups"]
+)
 def cloud_backups():
 
     os.makedirs("cloud_storage", exist_ok=True)
@@ -684,7 +714,10 @@ def cloud_backups():
     return files
 
 
-@app.get("/backups")
+@app.get(
+    "/backups",
+    tags=["Backups"]
+)
 def get_backups():
 
     db = SessionLocal()
@@ -701,7 +734,10 @@ def get_backups():
 # REPLICATION MODULE
 # =========================
 
-@app.post("/generate_replication")
+@app.post(
+    "/generate_replication",
+    tags=["Replicación"]
+)
 def generate_replication():
 
     db = SessionLocal()
@@ -797,7 +833,10 @@ def generate_replication():
             critical_replications
     }
 
-@app.get("/replication")
+@app.get(
+    "/replication",
+    tags=["Replicación"]
+)
 def get_replication():
 
     db = SessionLocal()
@@ -815,7 +854,10 @@ def get_replication():
 # REDIS CACHE MODULE
 # =========================
 
-@app.post("/generate_cache")
+@app.post(
+    "/generate_cache",
+     tags=["Cache Redis"]
+)
 def generate_cache():
 
     db = SessionLocal()
@@ -911,7 +953,10 @@ def generate_cache():
     }
 
 
-@app.get("/cache")
+@app.get(
+    "/cache",
+    tags=["Cache Redis"]
+)
 def get_cache():
 
     db = SessionLocal()
@@ -925,7 +970,10 @@ def get_cache():
     return cache
 
 
-@app.delete("/clear_cache")
+@app.delete(
+    "/clear_cache",
+    tags=["Cache Redis"]
+)
 def clear_cache():
 
     redis_client.flushall()
@@ -940,7 +988,10 @@ def clear_cache():
 # ALERT ENGINE
 # =========================
 
-@app.get("/alerts")
+@app.get(
+    "/alerts",
+    tags=["Alertas"]
+)
 def get_alerts():
 
     db = SessionLocal()
@@ -953,21 +1004,11 @@ def get_alerts():
 
     return alerts
 
-@app.get("/alerts")
-def get_alerts():
 
-    db = SessionLocal()
-
-    alerts = db.query(
-        Alert
-    ).all()
-
-    db.close()
-
-    return alerts
-
-
-@app.post("/generate_alerts")
+@app.post(
+    "/generate_alerts",
+    tags=["Alertas"]
+)
 def generate_alerts():
 
     db = SessionLocal()
@@ -1011,7 +1052,10 @@ def generate_alerts():
 # AI ADVISOR
 # =========================
 
-@app.post("/generate_ai_recommendations")
+@app.post(
+    "/generate_ai_recommendations",
+    tags=["IA"]
+)
 def generate_ai_recommendations():
 
     db = SessionLocal()
@@ -1068,7 +1112,10 @@ def generate_ai_recommendations():
     }
 
 
-@app.get("/ai_recommendations")
+@app.get(
+    "/ai_recommendations",
+    tags=["IA"]
+)
 def get_ai_recommendations():
 
     db = SessionLocal()
@@ -1086,7 +1133,10 @@ def get_ai_recommendations():
 # HEALTH MONITORING
 # =========================
 
-@app.get("/health")
+@app.get(
+    "/health",
+    tags=["Monitoreo"]
+)
 def health_check():
 
     return {
@@ -1112,7 +1162,10 @@ def health_check():
 # TOP QUERIES
 # =========================
 
-@app.get("/top_queries")
+@app.get(
+    "/top_queries",
+    tags=["Consultas SQL"]
+)
 def top_queries():
 
     db = SessionLocal()
